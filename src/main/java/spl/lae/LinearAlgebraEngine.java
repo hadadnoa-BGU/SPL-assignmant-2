@@ -48,6 +48,7 @@ public class LinearAlgebraEngine {
 
     public String getWorkerReport() {
         // TODO: return summary of worker activity
-        return null;
+        return executor.getWorkerReport();
+
     }
 }
