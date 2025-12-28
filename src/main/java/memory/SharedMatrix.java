@@ -3,7 +3,7 @@ package memory;
 public class SharedMatrix {
 
     private volatile SharedVector[] vectors = {}; // underlying vectors
-    private volatile VectorOrientation orientation = VectorOrientation.ROW_MAJOR;
+
 
 
     public SharedMatrix() {
@@ -39,7 +39,7 @@ public class SharedMatrix {
         }
 
         this.vectors = newVectors;
-        this.orientation = VectorOrientation.ROW_MAJOR;
+
     }
 
     public void loadColumnMajor(double[][] matrix) {
@@ -51,7 +51,7 @@ public class SharedMatrix {
         //check if matrix is empty
         if (matrix.length == 0) {
             this.vectors = new SharedVector[0];
-            this.orientation = VectorOrientation.COLUMN_MAJOR;
+
             return;
         }
 
@@ -76,7 +76,7 @@ public class SharedMatrix {
         }
 
         this.vectors = newVectors;
-        this.orientation = VectorOrientation.COLUMN_MAJOR;
+
 
     }
 
@@ -88,8 +88,8 @@ public class SharedMatrix {
             if(output.length == 0){
                 return new double[0][0];
             }
-            //orientation = rows
-            if(this.orientation == VectorOrientation.ROW_MAJOR){
+
+            if(this.getOrientation() == VectorOrientation.ROW_MAJOR){
                 double[][] out = new double[output.length][];
 
                 for (int i = 0; i < output.length; i++) {
@@ -101,7 +101,7 @@ public class SharedMatrix {
                 }
                 return out;
             }else{
-                //orientation = columns
+
                 int cols = output.length;
                 int rows = output[0].length();
 
@@ -137,7 +137,8 @@ public class SharedMatrix {
 
     public VectorOrientation getOrientation() {
         // TODO: return orientation
-        return orientation;
+        if (vectors.length == 0) return VectorOrientation.ROW_MAJOR;
+        return vectors[0].getOrientation();
     }
 
     private void acquireAllVectorReadLocks(SharedVector[] vecs) {
