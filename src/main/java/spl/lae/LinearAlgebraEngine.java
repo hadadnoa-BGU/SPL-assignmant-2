@@ -14,16 +14,34 @@ public class LinearAlgebraEngine {
 
     public LinearAlgebraEngine(int numThreads) {
         // TODO: create executor with given thread count
+
+        executor = new TiredExecutor(numThreads);
     }
 
     public ComputationNode run(ComputationNode computationRoot) {
         // TODO: resolve computation tree step by step until final matrix is produced
-        return null;
+
+        computationRoot.associativeNesting();
+
+        while (computationRoot.getNodeType() != ComputationNodeType.MATRIX){
+
+            ComputationNode node = computationRoot.findResolvable();
+            loadAndCompute(node);
+            node.resolve(leftMatrix.readRowMajor());
+        }
+
+
+        return computationRoot;
     }
 
     public void loadAndCompute(ComputationNode node) {
         // TODO: load operand matrices
+
+
+
         // TODO: create compute tasks & submit tasks to executor
+
+
     }
 
     public List<Runnable> createAddTasks() {

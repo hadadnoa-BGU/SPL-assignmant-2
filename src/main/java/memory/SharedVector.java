@@ -168,40 +168,28 @@ public class SharedVector {
         return result;
     }
 
-    public void vecMatMul(SharedMatrix matrix) 
-    {
-        if (matrix == null) 
+    public void vecMatMul(SharedMatrix matrix) {
+        if (matrix == null)
             throw new IllegalArgumentException("matrix is null");
 
         writeLock();
         // other.acquireAllVectorReadLocks();
-        try 
-        {
-            if(this.orientation == VectorOrientation.ROW_MAJOR)
-            {
-                if(other.getOrientation() == VectorOrientation.ROW_MAJOR)
-                {
-                    
+        try {
+            if (this.orientation == VectorOrientation.ROW_MAJOR) {
+                if (matrix.getOrientation() == VectorOrientation.ROW_MAJOR) {
+
+                } else {
+
                 }
-                else
-                {
+            } else {
+                if (matrix.getOrientation() == VectorOrientation.ROW_MAJOR) {
+
+                } else {
 
                 }
             }
-            else
-            {
-                if(other.getOrientation() == VectorOrientation.ROW_MAJOR)
-                {
-
-                }
-                else
-                {
-                    
-                }
-            }
-        } 
-        finally 
-        {
+        } finally {
             writeUnlock();
         }
+    }
 }
