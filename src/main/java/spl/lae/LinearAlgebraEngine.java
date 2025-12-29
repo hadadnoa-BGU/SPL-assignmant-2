@@ -4,6 +4,7 @@ import parser.*;
 import memory.*;
 import scheduling.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LinearAlgebraEngine {
@@ -39,16 +40,30 @@ public class LinearAlgebraEngine {
         // TODO: create compute tasks & submit tasks to executor
         //we assume the node is already associatively nested
 
-        Iterable<Runnable> tasks = new Iterable<Runnable>();
+        List<Runnable> tasks;
+        List<ComputationNode> children = node.getChildren();
+
+        leftMatrix.loadRowMajor(children.get(0).getMatrix());
+
+        if(children.size() == 2){
+            rightMatrix.loadRowMajor(children.get(1).getMatrix());
+        }
+
+
+        //switch case taken from computation node map op
         switch (node.getNodeType()) {
             case ADD:
                 tasks = createAddTasks();
+                break;
             case MULTIPLY:
-                createMultiplyTasks();
+                tasks = createMultiplyTasks();
+                break;
             case NEGATE:
-                createNegateTasks();
+                tasks = createNegateTasks();
+                break;
             case TRANSPOSE:
-                createTransposeTasks();
+                tasks = createTransposeTasks();
+                break;
             default:
                 throw new IllegalArgumentException("Unknown operator: " + node.getNodeType());
         }
@@ -64,22 +79,81 @@ public class LinearAlgebraEngine {
 
     public List<Runnable> createAddTasks() {
         // TODO: return tasks that perform row-wise addition
+
+
+        int n = leftMatrix.length();
+        if (n != rightMatrix.length()) {
+            throw new IllegalArgumentException("Addition: different number of vectors");
+        }
+
+        List<Runnable> tasks = new ArrayList<>();
+
+        for(int i = 0; i < n; i++){
+            //for readability change i to row
+            int row = i;
+
+
+            tasks.add(() -> {
+                SharedVector left = leftMatrix.get(row);
+                SharedVector right = rightMatrix.get(row);
+
+                left.add(right);
+            });
+
+        }
         return null;
     }
 
     public List<Runnable> createMultiplyTasks() {
-        // TODO: return tasks that perform row × matrix multiplication
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        int numRows = leftMatrix.length();
+
+        for (int i = 0; i < numRows; i++) {
+            final int currentRow = i;
+            tasks.add(() -> {
+                SharedVector leftVec = leftMatrix.get(currentRow);
+
+
+                leftVec.vecMatMul(rightMatrix);
+            });
+        }
+
+        return tasks;
     }
 
     public List<Runnable> createNegateTasks() {
         // TODO: return tasks that negate rows
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+
+        // iterate through all the vectors
+        for (int i = 0; i < leftMatrix.length(); i++) {
+            SharedVector v = leftMatrix.get(i);
+
+            tasks.add(() -> {
+                // multiply by -1 in the vector negate function
+                v.negate();
+            });
+        }
+
+        return tasks;
     }
 
     public List<Runnable> createTransposeTasks() {
         // TODO: return tasks that transpose rows
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+
+        // goes through all the vectors in the matrix
+        for (int i = 0; i < leftMatrix.length(); i++) {
+
+            SharedVector v = leftMatrix.get(i);
+
+            tasks.add(() -> {
+                // change the orientation from row to column or vice versa
+                v.transpose();
+            });
+        }
+
+        return tasks;
     }
 
     public String getWorkerReport() {
