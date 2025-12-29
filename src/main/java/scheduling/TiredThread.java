@@ -55,8 +55,12 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * This method is non-blocking: if the worker is not ready to accept a task,
      * it throws IllegalStateException.
      */
-    public void newTask(Runnable task) {
-       // TODO
+    public void newTask(Runnable task) 
+    {
+        if (!handoff.offer(task)) 
+        {
+            throw new IllegalStateException("Worker " + id + " is not ready to accept a task");
+        }
     }
 
     /**
@@ -64,17 +68,33 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
-       // TODO
+       alive.set(false);
+        handoff.offer(POISON_PILL);
     }
 
     @Override
     public void run() {
-       // TODO
+       while (alive.get()) 
+       {
+            Runnable task;
+            try 
+            {
+                task = handoff.take();
+            } 
+            catch (InterruptedException e) 
+            {
+                continue;
+            }
+            if (task == POISON_PILL) break;
+
+            task.run();
+        }
     }
 
     @Override
     public int compareTo(TiredThread o) {
-        // TODO
-        return 0;
+        int c = Double.compare(this.getFatigue(), o.getFatigue());
+        if (c != 0) return c;
+        return Integer.compare(this.id, o.id); // tie breaker if this.getFatigue() == o.getFatigue()
     }
 }
