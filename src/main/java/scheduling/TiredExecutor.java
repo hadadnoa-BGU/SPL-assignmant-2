@@ -17,9 +17,9 @@ public class TiredExecutor {
 
         for (int i = 0; i < numThreads; i++) {
             // some random fatige factor
-            double fatige = 0.5 + (1 / (double)numThreads) * i;
+            double fatigue = 0.5 + (1 / (double)numThreads) * i;
 
-            TiredThread w = new TiredThread(i, ff);
+            TiredThread w = new TiredThread(i, fatigue);
             workers[i] = w;
             idleMinHeap.add(w);
             w.start();
@@ -62,7 +62,7 @@ public class TiredExecutor {
 
     public void submitAll(Iterable<Runnable> tasks) {
         // TODO: submit tasks one by one and wait until all finish
-        for(Runnable task : task)
+        for(Runnable task : tasks)
         {
             submit(task);
         }
@@ -109,6 +109,11 @@ public class TiredExecutor {
         .append(", total=").append(workers.length)
         .append("\n");
 
+
+        double minFatigue = Double.MAX_VALUE;
+        double maxFatigue = Double.MIN_VALUE;
+
+
         for (TiredThread w : workers) 
         {
             sb.append("Worker ")
@@ -117,9 +122,18 @@ public class TiredExecutor {
             .append(" busy=").append(w.isBusy())
             .append(" used(ns)=").append(w.getTimeUsed())
             .append(" idle(ns)=").append(w.getTimeIdle())
-            .append(" fatigue=").append(w.getFatigue())
+            .append(" Fatigue=").append(w.getFatigue())
             .append("\n");
         }
+
+        double fairnessScore;
+        if (workers.length > 0) {
+            fairnessScore = maxFatigue - minFatigue;
+        } else {
+            fairnessScore = 0.0;
+        }
+
+        sb.append("Fairness=").append(fairnessScore).append("\n");
 
         return sb.toString();
     }

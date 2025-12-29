@@ -1,3 +1,4 @@
+import memory.SharedMatrix;
 import memory.SharedVector;
 import memory.VectorOrientation;
 import org.junit.jupiter.api.Test;
@@ -50,25 +51,33 @@ public class SharedVectorTest {
 
     @Test
     void testVecMatMul() {
+
         SharedVector v = new SharedVector(new double[]{1, 2}, VectorOrientation.ROW_MAJOR);
         SharedMatrix m = new SharedMatrix(new double[][]{
-            {3, 4},
-            {5, 6}
+                {3, 4},
+                {5, 6}
         });
+
+
         v.vecMatMul(m);
-        //assume that matrix is in column major
-        assert(v.get(0) == 11); // (1*3 + 2*4)
-        assert(v.get(1) == 17); // (1*5 + 2*6)
+
+
+        assert(v.get(0) == 13); // (1*3 + 2*5)
+        assert(v.get(1) == 16); // (1*4 + 2*6)
+
+        // --- Second Test Case ---
 
         SharedVector v2 = new SharedVector(new double[]{7, 8, 9}, VectorOrientation.ROW_MAJOR);
         SharedMatrix m2 = new SharedMatrix(new double[][]{
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9}
         });
+
         v2.vecMatMul(m2);
-        assert(v2.get(0) == 50); // (7*1 + 8*2 + 9*3)
-        assert(v2.get(1) == 122); // (7*4 + 8*5 + 9*6)
-        assert(v2.get(2) == 194); // (7*7 + 8*8 + 9*9)
+
+        assert(v2.get(0) == 102); // Col 0: 1, 4, 7
+        assert(v2.get(1) == 126); // Col 1: 2, 5, 8
+        assert(v2.get(2) == 150); // Col 2: 3, 6, 9
     }
 }
