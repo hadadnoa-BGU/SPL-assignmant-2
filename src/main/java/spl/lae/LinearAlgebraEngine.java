@@ -36,10 +36,28 @@ public class LinearAlgebraEngine {
 
     public void loadAndCompute(ComputationNode node) {
         // TODO: load operand matrices
-
-
-
         // TODO: create compute tasks & submit tasks to executor
+        //we assume the node is already associatively nested
+
+        Iterable<Runnable> tasks = new Iterable<Runnable>();
+        switch (node.getNodeType()) {
+            case ADD:
+                tasks = createAddTasks();
+            case MULTIPLY:
+                createMultiplyTasks();
+            case NEGATE:
+                createNegateTasks();
+            case TRANSPOSE:
+                createTransposeTasks();
+            default:
+                throw new IllegalArgumentException("Unknown operator: " + node.getNodeType());
+        }
+
+        executor.submitAll(tasks);
+
+
+
+
 
 
     }

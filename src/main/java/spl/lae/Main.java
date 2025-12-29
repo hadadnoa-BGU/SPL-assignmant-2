@@ -18,9 +18,6 @@ public class Main {
         try{
             InputParser inputParser = new InputParser();
             ComputationNode root = inputParser.parse(inputPath);
-
-            root.associativeNesting();
-
             LinearAlgebraEngine engine = new LinearAlgebraEngine(numOfThreads);
             ComputationNode result = engine.run(root);
             OutputWriter.write(result.getMatrix(), outputPath);
