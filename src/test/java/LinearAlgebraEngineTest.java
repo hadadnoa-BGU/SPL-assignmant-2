@@ -121,7 +121,7 @@ public class LinearAlgebraEngineTest {
     
 
         // 3. Run loadAndCompute
-        engine.loadAndCompute(addNode);
+            engine.loadAndCompute(addNode);
 
         // 4. Verify Result
         // Since loadAndCompute writes to 'leftMatrix' inside the engine, we check that

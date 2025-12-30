@@ -4,6 +4,8 @@ import scheduling.TiredThread;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TiredThreadTest {
@@ -74,26 +76,53 @@ public class TiredThreadTest {
 
     @Test
     void testRun() throws InterruptedException {
-        // Verifies the loop mechanism by checking if fatigue increases over time
-        double initialFatigue = thread1.getFatigue();
-        assertEquals(0.0, initialFatigue, 0.001);
+        // 1. Initial check
+        assertEquals(0.0, thread1.getFatigue(), 0.001);
 
-        // Run task
-        thread1.newTask(task1);
-        
-        while (thread1.isBusy()) {
-            Thread.sleep(10);
+        // 2. Submit Task 1: Signals the latch when finished
+        CountDownLatch latch1 = new CountDownLatch(1);
+        thread1.newTask(() -> {
+            try {
+                Thread.sleep(10); // Simulate tiny work
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                latch1.countDown(); // Signal DONE
+            }
+        });
+
+        // 3. Wait for Task 1 to finish (Wait up to 1 second)
+        boolean task1Done = latch1.await(1, TimeUnit.SECONDS);
+        if (!task1Done) {
+            throw new AssertionError("Task 1 timed out - thread did not run it.");
         }
 
-        // Run another task
-        thread1.newTask(task1);
-        
+        // 4. Wait for the thread to reset its 'busy' flag
+        // (The flag is set to false immediately AFTER the task finishes, so this is very fast)
         while (thread1.isBusy()) {
-            Thread.sleep(10);
+            Thread.sleep(1);
         }
 
-        // Assert fatigue accumulated
-        assertTrue(thread1.getFatigue() > 0, "Fatigue should be greater than 0 after running tasks");
+        // 5. Assert Fatigue Increased
+        double fatigueAfter1 = thread1.getFatigue();
+        assertTrue(fatigueAfter1 > 0, "Fatigue should increase after task 1");
+
+        // 6. Submit Task 2: Prove the loop works by running a second task
+        CountDownLatch latch2 = new CountDownLatch(1);
+        thread1.newTask(latch2::countDown);
+
+        boolean task2Done = latch2.await(1, TimeUnit.SECONDS);
+        if (!task2Done) {
+            throw new AssertionError("Task 2 timed out - loop might be broken.");
+        }
+
+        // 7. Wait for update
+        while (thread1.isBusy()) {
+            Thread.sleep(1);
+        }
+
+        // 8. Final Assert
+        assertTrue(thread1.getFatigue() > fatigueAfter1, "Fatigue should accumulate");
         assertTrue(thread1.getTimeUsed() > 0, "TimeUsed should be recorded");
     }
 
