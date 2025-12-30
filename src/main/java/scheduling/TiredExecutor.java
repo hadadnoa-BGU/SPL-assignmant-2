@@ -113,7 +113,7 @@ public class TiredExecutor {
         double minFatigue = Double.MAX_VALUE;
         double maxFatigue = Double.MIN_VALUE;
 
-
+        // print dettails for each worker thread
         for (TiredThread w : workers) 
         {
             sb.append("Worker ")
