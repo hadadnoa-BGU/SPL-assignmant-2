@@ -28,9 +28,9 @@ public class TiredExecutor {
 
     public void submit(Runnable task) {
         // TODO
-        if (task == null) 
+        if (task == null) {
             throw new IllegalArgumentException("task is null");
-
+        }
         try 
         {
             final TiredThread worker = idleMinHeap.take();
