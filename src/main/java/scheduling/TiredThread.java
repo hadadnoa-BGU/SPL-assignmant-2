@@ -57,6 +57,10 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      */
     public void newTask(Runnable task) 
     {
+        if (!alive.get()) {
+            throw new IllegalStateException("Worker is shutting down");
+        }
+
         if (!handoff.offer(task)) 
         {
             throw new IllegalStateException("Worker " + id + " is not ready to accept a task");
