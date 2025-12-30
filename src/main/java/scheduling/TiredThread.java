@@ -57,6 +57,8 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      */
     public void newTask(Runnable task) 
     {
+        // TODO
+
         if (!alive.get()) {
             throw new IllegalStateException("Worker is shutting down");
         }
@@ -72,12 +74,15 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * Inserts a poison pill so the worker wakes up and exits.
      */
     public void shutdown() {
+        // TODO
        alive.set(false);
         handoff.offer(POISON_PILL);
     }
 
     @Override
     public void run() {
+        // TODO
+
         while (alive.get()) {
             Runnable task;
             try {
@@ -115,6 +120,7 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
 
     @Override
     public int compareTo(TiredThread o) {
+        // TODO
         int c = Double.compare(this.getFatigue(), o.getFatigue());
         if (c != 0) return c;
         return Integer.compare(this.id, o.id); // tie breaker if this.getFatigue() == o.getFatigue()
