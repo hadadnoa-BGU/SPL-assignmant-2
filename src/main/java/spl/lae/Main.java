@@ -10,7 +10,8 @@ public class Main {
         if(args.length != 3){
             System.err.println("Not enough args");
         }
-
+        
+        // parse command line argumets
         int numOfThreads = Integer.parseInt(args[0]);
         String inputPath = args[1];
         String outputPath = args[2];
