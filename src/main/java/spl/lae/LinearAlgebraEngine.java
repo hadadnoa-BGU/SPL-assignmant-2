@@ -101,7 +101,7 @@ public class LinearAlgebraEngine {
             });
 
         }
-        return null;
+        return tasks;
     }
 
     public List<Runnable> createMultiplyTasks() {

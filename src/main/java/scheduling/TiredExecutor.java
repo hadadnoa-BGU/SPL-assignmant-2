@@ -28,9 +28,9 @@ public class TiredExecutor {
 
     public void submit(Runnable task) {
         // TODO
-        if (task == null) 
+        if (task == null) {
             throw new IllegalArgumentException("task is null");
-
+        }
         try 
         {
             final TiredThread worker = idleMinHeap.take();
@@ -113,7 +113,7 @@ public class TiredExecutor {
         double minFatigue = Double.MAX_VALUE;
         double maxFatigue = Double.MIN_VALUE;
 
-
+        // print dettails for each worker thread
         for (TiredThread w : workers) 
         {
             sb.append("Worker ")
